@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Categories · QuizMaster{% endblock %}
+{% block content %}
+<div class="page-heading"><div><span class="eyebrow">CONTENT ORGANIZATION</span><h1>Categories</h1><p>Group quizzes by subject to help learners discover them.</p></div></div>
+<div class="form-columns"><section class="panel"><h2>Add category</h2><form method="post" class="stacked-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label for="name">Name</label><input id="name" name="name" maxlength="80" required><label for="description">Description</label><textarea id="description" name="description" rows="3" maxlength="300"></textarea><button class="btn btn-primary" type="submit">Create category</button></form></section>
+<section class="panel"><h2>Existing categories</h2>{% if categories %}<div class="simple-list">{% for category in categories %}<div class="simple-list-row"><div><strong>{{ category.name }}</strong><span>{{ category.description or "No description" }} · {{ category.quizzes|length }} quiz{{ "s" if category.quizzes|length != 1 else "" }}</span></div><form method="post" action="{{ url_for('admin.delete_category', category_id=category.id) }}" data-confirm="Delete this category? Categories used by quizzes cannot be removed."><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="text-danger-button" type="submit">Delete</button></form></div>{% endfor %}</div>{% else %}<p class="empty-inline">No categories yet.</p>{% endif %}</section></div>
+{% endblock %}

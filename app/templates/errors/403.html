@@ -1,0 +1,2 @@
+{% extends "base.html" %}{% block title %}Access denied · QuizMaster{% endblock %}
+{% block content %}<section class="empty-panel"><span class="eyebrow">403 · Access denied</span><h1>You don’t have permission to view this page.</h1><a class="btn btn-primary" href="{{ url_for('student.dashboard') }}">Back to dashboard</a></section>{% endblock %}

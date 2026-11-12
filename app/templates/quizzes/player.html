@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ attempt.quiz_title }} · QuizMaster{% endblock %}
+{% block content %}
+<div class="quiz-player-heading"><div><a class="back-link" href="{{ url_for('quizzes.detail', quiz_id=attempt.quiz_id) }}">← Quiz details</a><h1>{{ attempt.quiz_title }}</h1></div><div class="timer" id="quiz-timer" data-seconds="{{ remaining_seconds }}" role="timer" aria-live="polite"><span>Time left</span><strong>--:--</strong></div></div>
+<div class="player-layout">
+  <section class="panel question-panel">
+    <div class="question-progress"><span>Question {{ answer_index + 1 }} of {{ attempt.answers|length }}</span><div class="progress"><div class="progress-bar" style="width:{{ ((answer_index + 1) / attempt.answers|length * 100)|round }}%"></div></div></div>
+    <div class="question-body"><span class="eyebrow">QUESTION {{ answer_index + 1 }}</span><h2>{{ answer.prompt_snapshot }}</h2>
+      <form method="post" action="{{ url_for('quizzes.save_answer', attempt_id=attempt.id, answer_id=answer.id) }}" class="answer-form" data-answer-form>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% for option in answer.options_snapshot %}<label class="answer-option {{ 'selected' if answer.selected_option_key == option.key }}"><input type="radio" name="option_key" value="{{ option.key }}" {{ "checked" if answer.selected_option_key == option.key }}><span class="option-marker">{{ "ABCD"[loop.index0] }}</span><span>{{ option.text }}</span></label>{% endfor %}
+        <p id="save-status" class="save-status" aria-live="polite"></p>
+      </form>
+    </div>
+    <div class="question-nav">
+      {% if answer_index > 0 %}<a class="btn btn-outline-secondary" href="{{ url_for('quizzes.play', attempt_id=attempt.id, question=answer_index) }}">← Previous</a>{% else %}<span></span>{% endif %}
+      {% if answer_index + 1 < attempt.answers|length %}<a class="btn btn-primary" href="{{ url_for('quizzes.play', attempt_id=attempt.id, question=answer_index + 2) }}">Next question →</a>{% else %}<button class="btn btn-primary" type="button" data-submit-attempt>Submit quiz</button>{% endif %}
+    </div>
+  </section>
+  <aside class="panel question-map"><h2>Your questions</h2><p>Choose a question to review your saved answer.</p><div class="question-dots">{% for item in attempt.answers %}<a href="{{ url_for('quizzes.play', attempt_id=attempt.id, question=loop.index) }}" class="{{ 'current' if item.id == answer.id }} {{ 'answered' if item.selected_option_key }}" aria-label="Question {{ loop.index }}{{ ', answered' if item.selected_option_key else ', unanswered' }}">{{ loop.index }}</a>{% endfor %}</div><div class="map-legend"><span><i class="dot-answered"></i> Answered</span><span><i class="dot-current"></i> Current</span></div></aside>
+</div>
+<form id="final-submit" method="post" action="{{ url_for('quizzes.submit', attempt_id=attempt.id) }}" hidden><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"></form>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/quiz.js') }}" defer></script>{% endblock %}

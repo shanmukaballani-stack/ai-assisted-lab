@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Manage quizzes · QuizMaster{% endblock %}
+{% block content %}
+<div class="page-heading"><div><span class="eyebrow">CONTENT</span><h1>Manage quizzes</h1><p>Create, edit, publish, or archive learning content.</p></div><a class="btn btn-primary" href="{{ url_for('admin.create_quiz') }}">+ New quiz</a></div>
+<section class="panel table-panel">{% if page.items %}<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Quiz</th><th>Category</th><th>Questions</th><th>Status</th><th>Updated</th><th></th></tr></thead><tbody>{% for quiz in page.items %}
+<tr><td><strong>{{ quiz.title }}</strong><div class="muted">{{ quiz.difficulty }}</div></td><td>{{ quiz.category.name }}</td><td>{{ quiz.questions|length }}</td><td><span class="result-pill {{ 'passed' if quiz.published and not quiz.archived else 'failed' }}">{{ "Published" if quiz.published and not quiz.archived else ("Archived" if quiz.archived else "Draft") }}</span></td><td>{{ quiz.updated_at.strftime("%b %d, %Y") }}</td><td><a href="{{ url_for('admin.edit_quiz', quiz_id=quiz.id) }}">Edit</a></td></tr>
+{% endfor %}</tbody></table></div>{% else %}<div class="empty-inline"><strong>No quizzes yet.</strong><span>Create your first quiz to get started.</span><a class="btn btn-primary btn-sm" href="{{ url_for('admin.create_quiz') }}">Create quiz</a></div>{% endif %}
+{% if page.pages > 1 %}<nav class="pagination-nav" aria-label="Quiz management pages">{% if page.has_prev %}<a href="{{ url_for('admin.quizzes', page=page.prev_num) }}">← Previous</a>{% endif %}<span>Page {{ page.page }} of {{ page.pages }}</span>{% if page.has_next %}<a href="{{ url_for('admin.quizzes', page=page.next_num) }}">Next →</a>{% endif %}</nav>{% endif %}</section>
+{% endblock %}

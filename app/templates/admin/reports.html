@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Attempt reports · QuizMaster{% endblock %}
+{% block content %}
+<div class="page-heading"><div><span class="eyebrow">PLATFORM ANALYTICS</span><h1>Attempt reports</h1><p>Review completed results across the platform.</p></div></div>
+<section class="panel table-panel">{% if page.items %}<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Learner</th><th>Quiz</th><th>Completed</th><th>Points</th><th>Score</th><th>Outcome</th><th>Duration</th></tr></thead><tbody>
+{% for attempt in page.items %}<tr><td>{{ attempt.user.name if attempt.user else "Unknown learner" }}</td><td>{{ attempt.quiz_title }}</td><td>{{ attempt.completed_at.strftime("%b %d, %Y %H:%M") }}</td><td>{{ attempt.score_points }}/{{ attempt.total_points }}</td><td>{{ attempt.percentage }}%</td><td>{{ "Passed" if attempt.passed else "Not passed" }}</td><td>{{ attempt.duration_seconds }}s</td></tr>{% endfor %}
+</tbody></table></div>{% else %}<div class="empty-inline"><span>No completed attempts to report.</span></div>{% endif %}
+{% if page.pages > 1 %}<nav class="pagination-nav" aria-label="Report pages">{% if page.has_prev %}<a href="{{ url_for('admin.reports', page=page.prev_num) }}">← Previous</a>{% endif %}<span>Page {{ page.page }} of {{ page.pages }}</span>{% if page.has_next %}<a href="{{ url_for('admin.reports', page=page.next_num) }}">Next →</a>{% endif %}</nav>{% endif %}</section>
+{% endblock %}

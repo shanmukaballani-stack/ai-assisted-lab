@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}QuizMaster — Learn by doing{% endblock %}
+{% block public_content %}
+<main class="landing">
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">A smarter way to practice</span>
+      <h1>Build confidence,<br><span>one quiz at a time.</span></h1>
+      <p>Practice what you learn, track your progress, and turn small study sessions into lasting knowledge.</p>
+      <div class="hero-actions"><a class="btn btn-primary btn-lg" href="{{ url_for('auth.register') }}">Get started</a><a class="btn btn-outline-secondary btn-lg" href="{{ url_for('auth.login') }}">Sign in</a></div>
+      <p class="hero-note">Free to join · Progress that stays yours</p>
+    </div>
+    <div class="hero-art" aria-label="Illustration of a quiz score card">
+      <div class="score-card"><div class="score-top"><span class="score-dot">✓</span><span>Weekly progress</span><span class="score-gain">+12%</span></div>
+        <div class="score-number">82<span>%</span></div><div class="progress score-progress"><div class="progress-bar" style="width:82%"></div></div>
+        <div class="score-footer"><span>Keep up the momentum</span><strong>4 day streak</strong></div>
+      </div>
+      <div class="floating-note">✦ &nbsp;Nice work!</div>
+    </div>
+  </section>
+  <section class="landing-section"><div class="section-heading"><span class="eyebrow">A little practice goes a long way</span><h2>Everything you need to keep learning</h2></div>
+    <div class="feature-grid">
+      <article class="feature-card"><span class="feature-icon">01</span><h3>Learn at your pace</h3><p>Explore a growing set of focused quizzes and pick up right where you left off.</p></article>
+      <article class="feature-card"><span class="feature-icon">02</span><h3>Know your progress</h3><p>See real scores and completed attempts in one clear, private dashboard.</p></article>
+      <article class="feature-card"><span class="feature-icon">03</span><h3>Understand every answer</h3><p>Review explanations after each quiz to make the next attempt count.</p></article>
+    </div>
+  </section>
+  {% if featured_quizzes %}
+  <section class="landing-section"><div class="section-heading"><span class="eyebrow">Ready when you are</span><h2>Recently published</h2></div>
+    <div class="quiz-grid">{% for quiz in featured_quizzes %}
+      <article class="quiz-card"><div class="card-kicker">{{ quiz.category.name }} · {{ quiz.difficulty }}</div><h3>{{ quiz.title }}</h3><p>{{ quiz.description }}</p><div class="card-meta">{{ quiz.questions|length }} questions · {{ quiz.time_limit_seconds // 60 }} min</div></article>
+    {% endfor %}</div>
+  </section>
+  {% endif %}
+  <footer class="public-footer"><span>© {{ current_year }} QuizMaster</span><span>Practice with purpose.</span></footer>
+</main>
+{% endblock %}

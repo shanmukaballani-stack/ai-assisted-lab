@@ -1,0 +1,2 @@
+{% extends "base.html" %}{% block title %}Something went wrong · QuizMaster{% endblock %}
+{% block content %}<section class="empty-panel"><span class="eyebrow">500 · Server error</span><h1>Something went wrong. Please try again later.</h1><a class="btn btn-primary" href="{{ url_for('quizzes.landing') }}">Go to QuizMaster</a></section>{% endblock %}

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Track your student budget, expenses, and spending history.">
+  <title>Student Expense Tracker</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #17251f;
+      background: #f4f7f4;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 40px 0 56px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: #43876a;
+      font-size: 0.76rem;
+      font-weight: 750;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      letter-spacing: -0.045em;
+    }
+
+    .intro {
+      margin-bottom: 0;
+      color: #68766f;
+    }
+
+    .period {
+      min-width: 175px;
+      padding: 10px 12px;
+      border: 1px solid #dce5de;
+      border-radius: 10px;
+      background: #fff;
+      color: #33443b;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .summary-card,
+    .panel {
+      border: 1px solid #e2e9e3;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 5px 18px rgb(26 52 38 / 4%);
+    }
+
+    .summary-card {
+      padding: 20px;
+    }
+
+    .summary-label {
+      margin-bottom: 12px;
+      color: #68766f;
+      font-size: 0.9rem;
+    }
+
+    .summary-value {
+      margin-bottom: 0;
+      font-size: clamp(1.5rem, 3vw, 1.9rem);
+      font-weight: 750;
+      letter-spacing: -0.04em;
+    }
+
+    .summary-value.remaining {
+      color: #32815c;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.5fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .forms-column {
+      display: grid;
+      gap: 20px;
+    }
+
+    .panel {
+      padding: 22px;
+    }
+
+    .panel h2 {
+      margin-bottom: 6px;
+      font-size: 1.12rem;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-description {
+      margin-bottom: 20px;
+      color: #748078;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      color: #36473d;
+      font-size: 0.86rem;
+      font-weight: 650;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 42px;
+      padding: 9px 11px;
+      border: 1px solid #d8e1da;
+      border-radius: 8px;
+      background: #fff;
+      color: #17251f;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .period:focus {
+      outline: 3px solid rgb(67 135 106 / 20%);
+      border-color: #43876a;
+    }
+
+    .button {
+      width: 100%;
+      min-height: 43px;
+      border: 0;
+      border-radius: 8px;
+      background: #287b55;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .button:hover {
+      background: #216647;
+    }
+
+    .history-panel {
+      min-width: 0;
+    }
+
+    .history-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .history-heading h2 {
+      margin-bottom: 0;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th,
+    td {
+      padding: 13px 12px;
+      border-bottom: 1px solid #edf1ed;
+      white-space: nowrap;
+    }
+
+    th {
+      color: #748078;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    td {
+      color: #36473d;
+      font-size: 0.88rem;
+    }
+
+    td.amount {
+      color: #26382e;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    th:last-child {
+      text-align: right;
+    }
+
+    .category {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #eff6f0;
+      color: #397653;
+      font-size: 0.76rem;
+      font-weight: 650;
+    }
+
+    .empty-state {
+      padding: 28px 12px;
+      color: #748078;
+      text-align: center;
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        width: min(100% - 28px, 560px);
+        padding-top: 28px;
+      }
+
+      .page-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .period {
+        width: 100%;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .summary-card {
+        padding: 16px;
+      }
+
+      .summary-label {
+        margin-bottom: 6px;
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Campus money, made simple</p>
+        <h1>Student Expense Tracker</h1>
+        <p class="intro">Set a budget, log your spending, and stay on track.</p>
+      </div>
+      <label>
+        <span class="eyebrow">Tracking period</span>
+        <select class="period" name="period" aria-label="Tracking period">
+          <option value="month">This month</option>
+          <option value="week">This week</option>
+          <option value="semester">This semester</option>
+        </select>
+      </label>
+    </header>
+
+    <section class="summary-grid" aria-label="Budget summary">
+      <article class="summary-card">
+        <p class="summary-label" id="budget-label">Monthly budget</p>
+        <p class="summary-value" id="budget-summary">₹0.00</p>
+      </article>
+      <article class="summary-card">
+        <p class="summary-label">Total spent</p>
+        <p class="summary-value" id="spent-summary">₹0.00</p>
+      </article>
+      <article class="summary-card">
+        <p class="summary-label">Remaining balance</p>
+        <p class="summary-value remaining" id="remaining-summary">₹0.00</p>
+      </article>
+    </section>
+    <p class="tracker-status" id="tracker-status" role="status" aria-live="polite" hidden></p>
+
+    <div class="content-grid">
+      <div class="forms-column">
+        <section class="panel" aria-labelledby="budget-heading">
+          <h2 id="budget-heading">Set your budget</h2>
+          <p class="panel-description">Choose how much you plan to spend for this period.</p>
+          <form id="budget-form">
+            <div class="field">
+              <label for="budget-amount">Budget amount</label>
+              <input id="budget-amount" name="budget" type="number" min="0" step="0.01" placeholder="e.g. 500.00" required>
+            </div>
+            <button class="button" type="submit">Save budget</button>
+          </form>
+        </section>
+
+        <section class="panel" aria-labelledby="expense-heading">
+          <h2 id="expense-heading">Add an expense</h2>
+          <p class="panel-description">Record a purchase to keep your spending history up to date.</p>
+          <form id="expense-form">
+            <div class="field">
+              <label for="expense-name">Expense name</label>
+              <input id="expense-name" name="name" type="text" placeholder="e.g. Lunch" required>
+            </div>
+            <div class="field">
+              <label for="expense-amount">Amount</label>
+              <input id="expense-amount" name="amount" type="number" min="0.01" step="0.01" placeholder="e.g. 12.50" required>
+            </div>
+            <div class="field">
+              <label for="expense-category">Category</label>
+              <select id="expense-category" name="category" required>
+                <option value="" disabled selected>Select a category</option>
+                <option value="Food">Food</option>
+                <option value="Transport">Transport</option>
+                <option value="Books">Books</option>
+                <option value="Supplies">Supplies</option>
+                <option value="Housing">Housing</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="expense-date">Date</label>
+              <input id="expense-date" name="date" type="date" required>
+            </div>
+            <button class="button" type="submit">Add expense</button>
+          </form>
+        </section>
+      </div>
+
+      <section class="panel history-panel" aria-labelledby="history-heading">
+        <div class="history-heading">
+          <h2 id="history-heading">Expense history</h2>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Expense</th>
+                <th scope="col">Category</th>
+                <th scope="col">Date</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody id="expense-history">
+              <tr>
+                <td class="empty-state" colspan="5">No expenses recorded yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script src="script.js" defer></script>
+</body>
+</html>

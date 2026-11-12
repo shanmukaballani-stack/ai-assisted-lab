@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Users · QuizMaster{% endblock %}
+{% block content %}
+<div class="page-heading"><div><span class="eyebrow">ACCOUNT MANAGEMENT</span><h1>Users</h1><p>Review learner accounts and disable access when necessary. Create administrators with the CLI.</p></div></div>
+<section class="panel table-panel">{% if page.items %}<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>State</th><th></th></tr></thead><tbody>
+{% for user in page.items %}<tr><td><strong>{{ user.name }}</strong></td><td>{{ user.email }}</td><td>{{ user.role|title }}</td><td>{{ user.created_at.strftime("%b %d, %Y") }}</td><td><span class="result-pill {{ 'passed' if user.active else 'failed' }}">{{ "Active" if user.active else "Inactive" }}</span></td><td>{% if user.role == "student" %}<form method="post" action="{{ url_for('admin.toggle_user', user_id=user.id) }}" data-confirm="{{ 'Deactivate' if user.active else 'Reactivate' }} this learner account?"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="text-link-button" type="submit">{{ "Deactivate" if user.active else "Reactivate" }}</button></form>{% else %}<span class="muted">Protected</span>{% endif %}</td></tr>{% endfor %}
+</tbody></table></div>{% else %}<div class="empty-inline"><span>No user accounts yet.</span></div>{% endif %}
+{% if page.pages > 1 %}<nav class="pagination-nav" aria-label="User pages">{% if page.has_prev %}<a href="{{ url_for('admin.users', page=page.prev_num) }}">← Previous</a>{% endif %}<span>Page {{ page.page }} of {{ page.pages }}</span>{% if page.has_next %}<a href="{{ url_for('admin.users', page=page.next_num) }}">Next →</a>{% endif %}</nav>{% endif %}</section>
+{% endblock %}

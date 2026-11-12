@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ quiz.title }} · QuizMaster{% endblock %}
+{% block content %}
+<div class="breadcrumb"><a href="{{ url_for('quizzes.catalogue') }}">Explore quizzes</a><span>/</span><span>{{ quiz.category.name }}</span></div>
+<section class="quiz-detail">
+  <div><span class="eyebrow">{{ quiz.category.name }} · {{ quiz.difficulty }}</span><h1>{{ quiz.title }}</h1><p class="detail-description">{{ quiz.description }}</p>
+    <div class="detail-facts"><div><strong>{{ quiz.questions|length }}</strong><span>Questions</span></div><div><strong>{{ quiz.time_limit_seconds // 60 }} min</strong><span>Time limit</span></div><div><strong>{{ quiz.passing_percentage|int }}%</strong><span>Pass mark</span></div><div><strong>{{ quiz.max_attempts or "∞" }}</strong><span>Attempts allowed</span></div></div>
+  </div>
+  <aside class="panel start-panel"><h2>Ready to begin?</h2><p>Your timer starts when you open the first question. Answers save as you go.</p>
+  {% if active %}<a class="btn btn-primary w-100" href="{{ url_for('quizzes.play', attempt_id=active.id) }}">Continue attempt</a>
+  {% elif can_start %}<form method="post" action="{{ url_for('quizzes.start', quiz_id=quiz.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-primary w-100" type="submit">Start quiz <span aria-hidden="true">→</span></button></form>
+  {% else %}<button class="btn btn-secondary w-100" disabled>Attempt limit reached</button>{% endif %}
+  {% if quiz.max_attempts %}<p class="attempt-note">{{ completed }} of {{ quiz.max_attempts }} attempts used</p>{% endif %}
+  </aside>
+</section>
+{% endblock %}

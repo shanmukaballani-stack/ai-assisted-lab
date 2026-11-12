@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Admin overview · QuizMaster{% endblock %}
+{% block content %}
+<div class="page-heading"><div><span class="eyebrow">PLATFORM CONTROL</span><h1>Admin overview</h1><p>A snapshot of QuizMaster activity and content.</p></div><a class="btn btn-primary" href="{{ url_for('admin.create_quiz') }}">Create quiz</a></div>
+<section class="stats-grid" aria-label="Platform metrics">
+  <article class="stat-card"><span class="stat-label">Registered users</span><strong>{{ users }}</strong><span class="stat-hint">Across all account types</span></article>
+  <article class="stat-card"><span class="stat-label">Active quizzes</span><strong>{{ quizzes }}</strong><span class="stat-hint">{{ published }} published</span></article>
+  <article class="stat-card"><span class="stat-label">Completed attempts</span><strong>{{ attempts }}</strong><span class="stat-hint">Submitted by learners</span></article>
+  <article class="stat-card"><span class="stat-label">Average performance</span><strong>{{ average }}<small>%</small></strong><span class="stat-hint">Across completed attempts</span></article>
+</section>
+<section class="panel table-panel"><div class="panel-heading"><div><h2>Recent activity</h2><p>Latest quiz attempts</p></div><a href="{{ url_for('admin.reports') }}">View reports →</a></div>
+{% if recent %}<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Learner</th><th>Quiz</th><th>Status</th><th>Score</th><th>Started</th></tr></thead><tbody>{% for attempt in recent %}
+<tr><td>{{ attempt.user.name if attempt.user else "Unknown learner" }}</td><td>{{ attempt.quiz_title }}</td><td>{{ attempt.status|replace("_", " ")|title }}</td><td>{{ (attempt.percentage|string + "%") if attempt.percentage is not none else "—" }}</td><td>{{ attempt.started_at.strftime("%b %d, %Y %H:%M") }}</td></tr>
+{% endfor %}</tbody></table></div>{% else %}<div class="empty-inline"><span>No learner activity yet.</span></div>{% endif %}
+</section>
+<div class="admin-shortcuts"><a class="panel shortcut-card" href="{{ url_for('admin.quizzes') }}"><strong>Manage quizzes</strong><span>Edit, publish, or archive quizzes.</span></a><a class="panel shortcut-card" href="{{ url_for('admin.categories') }}"><strong>Manage categories</strong><span>Organize learning topics.</span></a><a class="panel shortcut-card" href="{{ url_for('admin.users') }}"><strong>Manage users</strong><span>Review and deactivate accounts.</span></a></div>
+{% endblock %}

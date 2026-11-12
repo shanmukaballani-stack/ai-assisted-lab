@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Leaderboard · QuizMaster{% endblock %}
+{% block content %}
+<div class="page-heading"><div><span class="eyebrow">LEARN TOGETHER</span><h1>Leaderboard</h1><p>Ranked by highest score, then fastest completion, then earliest submission. Only display names and quiz scores are shown.</p></div></div>
+<section class="panel table-panel">
+{% if rows %}<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Rank</th><th>Learner</th><th>Quiz</th><th>Score</th><th>Time</th></tr></thead><tbody>
+{% for attempt in rows %}<tr><td><strong>#{{ loop.index }}</strong></td><td>{{ attempt.user.name if attempt.user and attempt.user.active else "Learner" }}</td><td>{{ attempt.quiz_title }}</td><td>{{ attempt.percentage }}%</td><td>{{ (attempt.duration_seconds // 60) }}m {{ attempt.duration_seconds % 60 }}s</td></tr>{% endfor %}
+</tbody></table></div>{% else %}<div class="empty-inline"><strong>The leaderboard is waiting.</strong><span>Complete a quiz to join.</span></div>{% endif %}
+</section>
+{% endblock %}

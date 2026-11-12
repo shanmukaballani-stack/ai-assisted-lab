@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit quiz" if quiz else "Create quiz" }} · QuizMaster{% endblock %}
+{% block content %}
+<div class="page-heading"><div><a class="back-link" href="{{ url_for('admin.quizzes') }}">← Quiz management</a><h1>{{ "Edit quiz" if quiz else "Create a quiz" }}</h1><p>Set up quiz details, availability rules, and questions.</p></div></div>
+<section class="panel form-panel"><h2>Quiz settings</h2>
+<form method="post" class="stacked-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% if quiz %}<input type="hidden" name="action" value="save">{% endif %}
+  <label for="title">Title</label><input id="title" name="title" maxlength="160" value="{{ quiz.title if quiz else '' }}" required>
+  <label for="description">Description</label><textarea id="description" name="description" rows="3" maxlength="5000">{{ quiz.description if quiz else '' }}</textarea>
+  <div class="form-row"><div><label for="category_id">Category</label><select id="category_id" name="category_id" required><option value="">Select a category</option>{% for category in categories %}<option value="{{ category.id }}" {{ "selected" if quiz and quiz.category_id == category.id }}>{{ category.name }}</option>{% endfor %}</select></div>
+  <div><label for="difficulty">Difficulty</label><select id="difficulty" name="difficulty">{% for level in ["Beginner", "Intermediate", "Advanced"] %}<option {{ "selected" if quiz and quiz.difficulty == level }}>{{ level }}</option>{% endfor %}</select></div></div>
+  <div class="form-row"><div><label for="time_limit_minutes">Time limit (minutes)</label><input id="time_limit_minutes" name="time_limit_minutes" type="number" min="1" max="1440" value="{{ quiz.time_limit_seconds // 60 if quiz else 15 }}" required></div>
+  <div><label for="passing_percentage">Passing score (%)</label><input id="passing_percentage" name="passing_percentage" type="number" min="0" max="100" step="0.1" value="{{ quiz.passing_percentage if quiz else 60 }}" required></div>
+  <div><label for="max_attempts">Attempt limit (blank = unlimited)</label><input id="max_attempts" name="max_attempts" type="number" min="1" value="{{ quiz.max_attempts if quiz and quiz.max_attempts else '' }}"></div></div>
+  <div class="form-row"><div><label for="available_from">Available from (UTC, optional)</label><input id="available_from" name="available_from" type="datetime-local" value="{{ quiz.available_from.strftime('%Y-%m-%dT%H:%M') if quiz and quiz.available_from else '' }}"></div>
+  <div><label for="available_until">Available until (UTC, optional)</label><input id="available_until" name="available_until" type="datetime-local" value="{{ quiz.available_until.strftime('%Y-%m-%dT%H:%M') if quiz and quiz.available_until else '' }}"></div></div>
+  <label class="check-row"><input type="checkbox" name="show_feedback" {{ "checked" if not quiz or quiz.show_feedback }}> Show explanations after submission</label>
+  <button class="btn btn-primary" type="submit">{{ "Save settings" if quiz else "Create quiz" }}</button>
+</form></section>
+{% if quiz %}
+<section class="panel form-panel mt-4"><div class="panel-heading"><div><h2>Questions</h2><p>{{ quiz.questions|length }} question{{ "" if quiz.questions|length == 1 else "s" }} · Past attempts keep their original snapshots.</p></div></div>
+{% if quiz.questions %}<div class="admin-question-list">{% for question in quiz.questions %}<div class="admin-question"><span class="question-index">{{ loop.index }}</span><div><strong>{{ question.prompt }}</strong><span class="muted">{{ question.options|length }} options · {{ question.points }} point{{ "" if question.points == 1 else "s" }}</span></div><a href="{{ url_for('admin.edit_question', question_id=question.id) }}">Edit</a><form method="post" action="{{ url_for('admin.delete_question', question_id=question.id) }}" data-confirm="Remove this question? Existing submitted attempts will retain their snapshots."><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="text-danger-button" type="submit">Remove</button></form></div>{% endfor %}</div>{% else %}<p class="empty-inline">No questions have been added.</p>{% endif %}
+</section>
+<section class="panel form-panel mt-4"><h2>Add a question</h2><form method="post" action="{{ url_for('admin.add_question', quiz_id=quiz.id) }}" class="stacked-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="prompt">Question</label><textarea id="prompt" name="prompt" rows="2" maxlength="2000" required></textarea>
+  <div class="form-row"><div><label for="option_1">Option A</label><input id="option_1" name="option_1" maxlength="500" required></div><div><label for="option_2">Option B</label><input id="option_2" name="option_2" maxlength="500" required></div></div>
+  <div class="form-row"><div><label for="option_3">Option C</label><input id="option_3" name="option_3" maxlength="500" required></div><div><label for="option_4">Option D</label><input id="option_4" name="option_4" maxlength="500" required></div></div>
+  <div class="form-row"><div><label for="correct_option">Correct answer</label><select id="correct_option" name="correct_option"><option value="1">A</option><option value="2">B</option><option value="3">C</option><option value="4">D</option></select></div><div><label for="points">Points</label><input id="points" name="points" type="number" min="1" max="100" value="1" required></div></div>
+  <label for="explanation">Explanation (shown after submission if enabled)</label><textarea id="explanation" name="explanation" rows="2" maxlength="2000"></textarea>
+  <button class="btn btn-primary" type="submit">Add question</button>
+</form></section>
+<section class="panel form-panel mt-4"><h2>Publication</h2><p class="muted">Publishing makes this quiz visible in the student catalogue. Archiving hides it without deleting historical attempts.</p>
+  <div class="inline-actions">
+    {% if not quiz.published or quiz.archived %}<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="publish"><button class="btn btn-primary" type="submit" {{ "disabled" if not quiz.questions }}>Publish quiz</button></form>{% endif %}
+    {% if quiz.published %}<form method="post" data-confirm="Unpublish this quiz? Existing attempts will not be affected."><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="unpublish"><button class="btn btn-outline-secondary" type="submit">Unpublish</button></form>{% endif %}
+    {% if not quiz.archived %}<form method="post" data-confirm="Archive this quiz? Students will no longer be able to start it."><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="archive"><button class="btn btn-outline-danger" type="submit">Archive</button></form>{% endif %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

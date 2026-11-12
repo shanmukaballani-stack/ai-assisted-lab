@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}My attempts · QuizMaster{% endblock %}
+{% block content %}
+<div class="page-heading"><div><span class="eyebrow">YOUR LEARNING RECORD</span><h1>Attempt history</h1><p>Every quiz you’ve completed, all in one place.</p></div></div>
+<section class="panel table-panel">
+  {% if page.items %}<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Quiz</th><th>Date</th><th>Score</th><th>Time</th><th>Outcome</th><th></th></tr></thead><tbody>
+    {% for attempt in page.items %}<tr><td><strong>{{ attempt.quiz_title }}</strong></td><td>{{ attempt.completed_at.strftime("%b %d, %Y") }}</td><td>{{ attempt.score_points }}/{{ attempt.total_points }} <span class="muted">({{ attempt.percentage }}%)</span></td><td>{{ (attempt.duration_seconds // 60) }}m {{ attempt.duration_seconds % 60 }}s</td><td><span class="result-pill {{ 'passed' if attempt.passed else 'failed' }}">{{ "Passed" if attempt.passed else "Not passed" }}</span></td><td><a href="{{ url_for('quizzes.result', attempt_id=attempt.id) }}">Review result</a></td></tr>{% endfor %}
+  </tbody></table></div>
+  {% else %}<div class="empty-inline"><strong>No completed attempts yet.</strong><span>Your quiz history will show up here.</span><a class="btn btn-primary btn-sm" href="{{ url_for('quizzes.catalogue') }}">Browse quizzes</a></div>{% endif %}
+  {% if page.pages > 1 %}<nav class="pagination-nav" aria-label="Attempt history pages">
+    {% if page.has_prev %}<a href="{{ url_for('student.history', page=page.prev_num) }}">← Previous</a>{% endif %}<span>Page {{ page.page }} of {{ page.pages }}</span>{% if page.has_next %}<a href="{{ url_for('student.history', page=page.next_num) }}">Next →</a>{% endif %}
+  </nav>{% endif %}
+</section>
+{% endblock %}

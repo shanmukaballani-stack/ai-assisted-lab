@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Overview · QuizMaster{% endblock %}
+{% block content %}
+<div class="page-heading"><div><span class="eyebrow">YOUR LEARNING SPACE</span><h1>Good to see you, {{ current_user.name.split()[0] }}.</h1><p>Small steps add up. Here’s where your learning stands.</p></div><a class="btn btn-primary" href="{{ url_for('quizzes.catalogue') }}">Explore quizzes <span aria-hidden="true">→</span></a></div>
+<section class="stats-grid" aria-label="Learning summary">
+  <article class="stat-card"><span class="stat-label">Available quizzes</span><strong>{{ available }}</strong><span class="stat-hint">Ready to explore</span></article>
+  <article class="stat-card"><span class="stat-label">Quizzes completed</span><strong>{{ total_completed }}</strong><span class="stat-hint">Every attempt counts</span></article>
+  <article class="stat-card"><span class="stat-label">Average score</span><strong>{{ average }}<small>%</small></strong><span class="stat-hint">Across completed quizzes</span></article>
+  <article class="stat-card"><span class="stat-label">Personal best</span><strong>{{ best }}<small>%</small></strong><span class="stat-hint">Your highest score</span></article>
+</section>
+<div class="dashboard-grid">
+  <section class="panel chart-panel"><div class="panel-heading"><div><h2>Score trend</h2><p>Your latest completed attempts</p></div></div>
+    {% if trend %}<canvas id="score-chart" aria-label="Line chart of recent quiz scores" role="img"></canvas><script type="application/json" id="trend-data">{{ trend|tojson }}</script>
+    {% else %}<div class="chart-empty"><span class="empty-symbol">↗</span><strong>Your progress starts here</strong><span>Complete a quiz to see your score trend.</span><a href="{{ url_for('quizzes.catalogue') }}">Browse quizzes</a></div>{% endif %}
+  </section>
+  <section class="panel category-panel"><div class="panel-heading"><div><h2>Category performance</h2><p>Average score by subject</p></div></div>
+    {% if categories %}<ul class="category-list">{% for item in categories %}<li><div class="category-row"><span>{{ item.name }}</span><strong>{{ item.score }}%</strong></div><div class="progress"><div class="progress-bar" style="width:{{ item.score }}%"></div></div></li>{% endfor %}</ul>
+    {% else %}<div class="chart-empty"><strong>No category data yet</strong><span>Results will appear after your first quiz.</span></div>{% endif %}
+  </section>
+</div>
+<section class="panel table-panel"><div class="panel-heading"><div><h2>Recent attempts</h2><p>Your latest quiz activity</p></div><a href="{{ url_for('student.history') }}">View history →</a></div>
+  {% if attempts %}<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Quiz</th><th>Date</th><th>Score</th><th>Result</th><th></th></tr></thead><tbody>
+  {% for attempt in attempts %}<tr><td><strong>{{ attempt.quiz_title }}</strong></td><td>{{ attempt.completed_at.strftime("%b %d, %Y") }}</td><td>{{ attempt.percentage }}%</td><td><span class="result-pill {{ 'passed' if attempt.passed else 'failed' }}">{{ "Passed" if attempt.passed else "Keep practicing" }}</span></td><td><a href="{{ url_for('quizzes.result', attempt_id=attempt.id) }}">Details</a></td></tr>{% endfor %}
+  </tbody></table></div>{% else %}<div class="empty-inline"><strong>Your first attempt is waiting.</strong><span>Choose a quiz to start building your learning history.</span><a class="btn btn-primary btn-sm" href="{{ url_for('quizzes.catalogue') }}">Explore quizzes</a></div>{% endif %}
+</section>
+<section class="recommended"><div class="panel-heading"><div><h2>Pick up something new</h2><p>Freshly published quizzes from your library</p></div><a href="{{ url_for('quizzes.catalogue') }}">See all →</a></div>
+  {% if recommended %}<div class="quiz-grid">{% for quiz in recommended %}
+  <article class="quiz-card"><div class="card-kicker">{{ quiz.category.name }} <span>·</span> {{ quiz.difficulty }}</div><h3>{{ quiz.title }}</h3><p>{{ quiz.description }}</p><div class="card-meta">{{ quiz.questions|length }} questions <span>·</span> {{ quiz.time_limit_seconds // 60 }} min</div><a class="stretched-link" href="{{ url_for('quizzes.detail', quiz_id=quiz.id) }}" aria-label="View {{ quiz.title }}"></a></article>
+  {% endfor %}</div>{% else %}<div class="empty-inline"><span>No quizzes are published yet. Check back soon.</span></div>{% endif %}
+</section>
+{% endblock %}
+{% block scripts %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script><script src="{{ url_for('static', filename='js/charts.js') }}" defer></script>{% endblock %}
