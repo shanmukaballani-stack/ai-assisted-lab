@@ -9,3 +9,4 @@ instance/
 *.sqlite3
 .venv/
 venv/
+PlacementTracker/placements.db
